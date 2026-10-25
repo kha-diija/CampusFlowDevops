@@ -3,6 +3,7 @@ package com.example.campusflow.config;
 import com.example.campusflow.entity.Etudiant;
 import com.example.campusflow.entity.Personnel;
 import com.example.campusflow.entity.Salle;
+import com.example.campusflow.enums.Role;
 import com.example.campusflow.enums.TypeSalle;
 import com.example.campusflow.repository.SalleRepository;
 import com.example.campusflow.repository.UtilisateurRepository;
@@ -46,9 +47,10 @@ public class DataInitializer implements CommandLineRunner {
         etudiant.setPrenom("Nassim");
         etudiant.setEmail("etudiant@campusflow.ma");
         etudiant.setMotDePasse(passwordEncoder.encode("Etudiant@123"));
-        etudiant.setCne("CNE-2024-001");
+        etudiant.setNumeroEtudiant("CNE-2024-001");
         etudiant.setFiliere("Informatique");
-        etudiant.setRole(com.example.campusflow.enums.Role.ETUDIANT);
+        etudiant.setRole(Role.ETUDIANT);
+        etudiant.setActif(true);
         utilisateurRepository.save(etudiant);
     }
 
@@ -63,8 +65,10 @@ public class DataInitializer implements CommandLineRunner {
         personnel.setEmail("personnel@campusflow.ma");
         personnel.setMotDePasse(passwordEncoder.encode("Personnel@123"));
         personnel.setDepartement("Informatique");
+        personnel.setMatricule("MAT-2024-001");
         personnel.setAutorisePublication(true);
-        personnel.setRole(com.example.campusflow.enums.Role.PERSONNEL);
+        personnel.setRole(Role.PERSONNEL_HABILITE);
+        personnel.setActif(true);
         utilisateurRepository.save(personnel);
     }
 

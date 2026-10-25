@@ -55,7 +55,7 @@ class AuthControllerIntegrationTest {
     void login_shouldReturnTokenAndUser_whenCredentialsAreValid() throws Exception {
         String requestBody = "{\"email\":\"etudiant@campusflow.ma\",\"password\":\"Etudiant@123\"}";
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
             .andDo(print())
@@ -69,7 +69,7 @@ class AuthControllerIntegrationTest {
     void login_shouldReturn401_whenPasswordIsIncorrect() throws Exception {
         String requestBody = "{\"email\":\"etudiant@campusflow.ma\",\"password\":\"Mauvais@123\"}";
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
             .andDo(print())
@@ -81,7 +81,7 @@ class AuthControllerIntegrationTest {
     void login_shouldReturn401_whenEmailDoesNotExist() throws Exception {
         String requestBody = "{\"email\":\"inconnu@campusflow.ma\",\"password\":\"Etudiant@123\"}";
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
             .andDo(print())
@@ -91,7 +91,7 @@ class AuthControllerIntegrationTest {
 
     @Test
     void protectedEndpoint_shouldReturn401_withoutToken() throws Exception {
-        mockMvc.perform(get("/api/auth/me"))
+        mockMvc.perform(get("/auth/me"))
             .andDo(print())
             .andExpect(status().isUnauthorized());
     }

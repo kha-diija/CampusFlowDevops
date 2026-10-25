@@ -2,9 +2,7 @@ package com.example.campusflow.security;
 
 import com.example.campusflow.entity.Utilisateur;
 import com.example.campusflow.repository.UtilisateurRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,12 +20,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable"));
 
-        String authority = "ROLE_" + utilisateur.getRole().name();
-
-        return new User(
-            utilisateur.getEmail(),
-            utilisateur.getMotDePasse(),
-            List.of(new SimpleGrantedAuthority(authority))
-        );
+        return User.withUsername(utilisateur.getEmail())
+            .password(utilisateur.getMotDePasse())
+            .authorities("ROLE_" + utilisateur.getRole().name())
+            .disabled(!Boolean.TRUE.equals(utilisateur.getActif()))
+            .accountLocked(!Boolean.TRUE.equals(utilisateur.getActif()))
+            .build();
     }
 }
