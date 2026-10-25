@@ -3,6 +3,7 @@ package com.example.campusflow.controller;
 import com.example.campusflow.dto.ForgotPasswordRequest;
 import com.example.campusflow.dto.LoginRequest;
 import com.example.campusflow.dto.LoginResponse;
+import com.example.campusflow.dto.RegisterRequest;
 import com.example.campusflow.dto.ResetPasswordRequest;
 import com.example.campusflow.dto.UserResponse;
 import com.example.campusflow.service.AuthService;
@@ -28,6 +29,11 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
@@ -35,6 +41,10 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentification requise.");
+        }
+
         return ResponseEntity.ok(authService.getCurrentUser(authentication.getName()));
     }
 

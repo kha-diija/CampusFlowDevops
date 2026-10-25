@@ -1,4 +1,4 @@
-export type Role = 'ETUDIANT' | 'PERSONNEL'
+export type Role = 'ETUDIANT' | 'PERSONNEL' | 'PERSONNEL_HABILITE' | 'GESTIONNAIRE_EMPLOI_DU_TEMPS'
 
 export interface User {
   id: number
@@ -6,6 +6,7 @@ export interface User {
   prenom: string
   email: string
   role: Role
+  actif?: boolean
   autorisePublication?: boolean | null
 }
 
@@ -13,6 +14,16 @@ export interface LoginRequest {
   email: string
   password: string
   rememberMe?: boolean
+}
+
+export interface RegisterRequest {
+  nom: string
+  prenom: string
+  email: string
+  password: string
+  numeroEtudiant?: string
+  filiere: string
+  role?: Role
 }
 
 export interface LoginResponse {

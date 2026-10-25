@@ -2,6 +2,7 @@ package com.example.campusflow.dto;
 
 import com.example.campusflow.enums.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +16,7 @@ public class UserResponse {
     private String prenom;
     private String email;
     private Role role;
+    private Boolean actif;
+    private LocalDateTime dateCreation;
     private Boolean autorisePublication;
 }

@@ -15,6 +15,8 @@ public class UtilisateurMapper {
         response.setPrenom(utilisateur.getPrenom());
         response.setEmail(utilisateur.getEmail());
         response.setRole(utilisateur.getRole());
+        response.setActif(utilisateur.getActif());
+        response.setDateCreation(utilisateur.getDateCreation());
 
         if (utilisateur instanceof Personnel personnel) {
             response.setAutorisePublication(personnel.isAutorisePublication());

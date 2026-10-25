@@ -1,7 +1,12 @@
 import api from '@/services/api'
-import type { ForgotPasswordRequest, LoginRequest, LoginResponse, ResetPasswordRequest, User } from '@/types'
+import type { ForgotPasswordRequest, LoginRequest, LoginResponse, RegisterRequest, ResetPasswordRequest, User } from '@/types'
 
 export const authService = {
+  async register(payload: RegisterRequest): Promise<User> {
+    const response = await api.post<User>('/auth/register', payload)
+    return response.data
+  },
+
   async login(payload: LoginRequest): Promise<LoginResponse> {
     const response = await api.post<LoginResponse>('/auth/login', {
       email: payload.email,
