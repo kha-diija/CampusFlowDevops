@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: campusflow-db
+    environment:
+      POSTGRES_DB: campusflow
+      POSTGRES_USER: campus
+      POSTGRES_PASSWORD: campus_pwd
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campus -d campusflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    build: ./backend
+    image: campusflowdeops:1.0
+    container_name: campusflow-api
+    ports:
+      - "8081:8080"   # 8081 sur l'hôte car Jenkins peut occuper 8080
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/campusflow
+      SPRING_DATASOURCE_USERNAME: campus
+      SPRING_DATASOURCE_PASSWORD: campus_pwd
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: INFO
+      LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/actuator/health | grep -qE '^(200|401)$'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    build: ./frontend
+    image: campusflowdeops-frontend:1.0
+    container_name: campusflow-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
