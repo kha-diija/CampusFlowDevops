@@ -103,8 +103,7 @@ pipeline {
             echo 'Pipeline en échec : consulte les logs du stage concerné.'
         }
         always {
-            // Nettoie les images intermédiaires pour ne pas saturer le disque
-            sh 'docker image prune -f'
+            sh 'docker image prune -f || true'
         }
     }
 }
