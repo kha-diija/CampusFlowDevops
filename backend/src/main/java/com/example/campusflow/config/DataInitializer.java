@@ -34,6 +34,8 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         createEtudiant();
         createPersonnel();
+        createPersonnelSimple();
+        createGestionnaire();
         createSalles();
     }
 
@@ -70,6 +72,42 @@ public class DataInitializer implements CommandLineRunner {
         personnel.setRole(Role.PERSONNEL_HABILITE);
         personnel.setActif(true);
         utilisateurRepository.save(personnel);
+    }
+
+    private void createPersonnelSimple() {
+        if (utilisateurRepository.existsByEmail("personnel.simple@campusflow.ma")) {
+            return;
+        }
+
+        Personnel personnel = new Personnel();
+        personnel.setNom("Said");
+        personnel.setPrenom("Hassan");
+        personnel.setEmail("personnel.simple@campusflow.ma");
+        personnel.setMotDePasse(passwordEncoder.encode("PersonnelSimple@123"));
+        personnel.setDepartement("Administration");
+        personnel.setMatricule("MAT-2024-002");
+        personnel.setAutorisePublication(false);
+        personnel.setRole(Role.PERSONNEL);
+        personnel.setActif(true);
+        utilisateurRepository.save(personnel);
+    }
+
+    private void createGestionnaire() {
+        if (utilisateurRepository.existsByEmail("gestionnaire@campusflow.ma")) {
+            return;
+        }
+
+        Personnel gestionnaire = new Personnel();
+        gestionnaire.setNom("El Idrissi");
+        gestionnaire.setPrenom("Yassine");
+        gestionnaire.setEmail("gestionnaire@campusflow.ma");
+        gestionnaire.setMotDePasse(passwordEncoder.encode("Gestionnaire@123"));
+        gestionnaire.setDepartement("Emploi du temps");
+        gestionnaire.setMatricule("MAT-2024-003");
+        gestionnaire.setAutorisePublication(true);
+        gestionnaire.setRole(Role.GESTIONNAIRE_EMPLOI_DU_TEMPS);
+        gestionnaire.setActif(true);
+        utilisateurRepository.save(gestionnaire);
     }
 
     private void createSalles() {
