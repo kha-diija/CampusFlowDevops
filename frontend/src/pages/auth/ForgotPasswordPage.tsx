@@ -26,10 +26,12 @@ export function ForgotPasswordPage() {
   })
 
   const [sent, setSent] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
 
   const onSubmit = async (values: ForgotPasswordFormValues) => {
     try {
-      await authService.forgotPassword({ email: values.email })
+      const response = await authService.forgotPassword({ email: values.email })
+      setSuccessMessage(response.message)
       setSent(true)
     } catch (error) {
       setError('root', {
@@ -57,7 +59,7 @@ export function ForgotPasswordPage() {
       )}
 
       {sent ? (
-        <Alert variant="info">Si cet e-mail existe, un lien vous a été envoyé.</Alert>
+        <Alert variant="info">{successMessage || 'Si cet e-mail existe, un lien vous a été envoyé.'}</Alert>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <Input

@@ -59,9 +59,7 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-        throw new ResponseStatusException(
-            HttpStatus.NOT_IMPLEMENTED,
-            "TODO: Implémenter la réinitialisation du mot de passe."
-        );
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok().build();
     }
 }

@@ -10,6 +10,8 @@ import com.example.campusflow.enums.Role;
 import com.example.campusflow.mapper.UtilisateurMapper;
 import com.example.campusflow.repository.UtilisateurRepository;
 import com.example.campusflow.security.JwtService;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -102,7 +104,35 @@ public class AuthService {
     }
 
     public void forgotPassword(String email) {
-        logger.info("[DEV] Lien de réinitialisation pour {} : http://localhost:5173/reset-password?token=dev-reset-token-{}", email, email);
+        utilisateurRepository.findByEmail(email).ifPresentOrElse(utilisateur -> {
+            String token = UUID.randomUUID().toString();
+            utilisateur.setResetPasswordToken(token);
+            utilisateur.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(15));
+            utilisateurRepository.save(utilisateur);
+
+            logger.info("[DEV] Lien de réinitialisation pour {} : http://localhost:5173/reset-password?token={}", email, token);
+        }, () -> logger.info("[DEV] Demande de réinitialisation pour un e-mail inconnu : {}", email));
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        if (token == null || token.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le token est obligatoire.");
+        }
+
+        Utilisateur utilisateur = utilisateurRepository.findByResetPasswordToken(token)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le lien de réinitialisation est invalide ou expiré."));
+
+        if (utilisateur.getResetPasswordTokenExpiry() == null || utilisateur.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            utilisateur.setResetPasswordToken(null);
+            utilisateur.setResetPasswordTokenExpiry(null);
+            utilisateurRepository.save(utilisateur);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le lien de réinitialisation est invalide ou expiré.");
+        }
+
+        utilisateur.setMotDePasse(passwordEncoder.encode(newPassword));
+        utilisateur.setResetPasswordToken(null);
+        utilisateur.setResetPasswordTokenExpiry(null);
+        utilisateurRepository.save(utilisateur);
     }
 
     public UserResponse getAuthenticatedUser() {

@@ -16,11 +16,12 @@ export const authService = {
     return response.data
   },
 
-  async forgotPassword(payload: ForgotPasswordRequest) {
-    await api.post('/auth/forgot-password', payload)
+  async forgotPassword(payload: ForgotPasswordRequest): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>('/auth/forgot-password', payload)
+    return response.data
   },
 
-  async resetPassword(payload: ResetPasswordRequest) {
+  async resetPassword(payload: ResetPasswordRequest): Promise<void> {
     await api.post('/auth/reset-password', payload)
   },
 
