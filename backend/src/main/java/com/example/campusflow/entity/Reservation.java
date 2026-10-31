@@ -64,6 +64,9 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gestionnaire_id")
     private Personnel gestionnaire;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "utilisateur_id", nullable = false)
+    private Utilisateur utilisateur;
 
     @PrePersist
     protected void onCreate() {
