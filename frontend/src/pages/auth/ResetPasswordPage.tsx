@@ -29,6 +29,7 @@ export function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   const [success, setSuccess] = useState(false)
+  const hasToken = Boolean(token)
 
   const {
     register,
@@ -57,6 +58,14 @@ export function ResetPasswordPage() {
           : { label: 'Fort', score }
 
   const onSubmit = async (values: ResetPasswordFormValues) => {
+    if (!hasToken) {
+      setError('root', {
+        type: 'manual',
+        message: 'Le token de réinitialisation est manquant ou invalide. Vérifiez le lien reçu par e-mail.',
+      })
+      return
+    }
+
     try {
       await authService.resetPassword({ token, newPassword: values.newPassword })
       setSuccess(true)
@@ -84,6 +93,12 @@ export function ResetPasswordPage() {
           {errors.root.message}
         </Alert>
       )}
+
+      {!hasToken && !success ? (
+        <Alert variant="error" className="mb-5">
+          Le token de réinitialisation est manquant ou invalide. Vérifiez le lien reçu par e-mail.
+        </Alert>
+      ) : null}
 
       {success ? (
         <div className="space-y-4 rounded-2xl border border-border bg-white/5 p-5">
@@ -131,7 +146,7 @@ export function ResetPasswordPage() {
             error={errors.confirmPassword?.message}
           />
 
-          <Button type="submit" className="w-full" size="lg" loading={isSubmitting}>
+          <Button type="submit" className="w-full" size="lg" loading={isSubmitting} disabled={!hasToken}>
             Réinitialiser le mot de passe
           </Button>
         </form>

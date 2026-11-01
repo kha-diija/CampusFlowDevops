@@ -1,5 +1,8 @@
 package com.example.campusflow.controller;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -7,8 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.campusflow.entity.Etudiant;
+import com.example.campusflow.entity.Utilisateur;
 import com.example.campusflow.enums.Role;
 import com.example.campusflow.repository.UtilisateurRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +92,39 @@ class AuthControllerIntegrationTest {
             .andDo(print())
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.message").value("E-mail ou mot de passe incorrect"));
+    }
+
+    @Test
+    void forgotPassword_shouldCreateResetToken_whenUserExists() throws Exception {
+        mockMvc.perform(post("/auth/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"etudiant@campusflow.ma\"}"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Si un compte existe pour cette adresse e-mail, un message de réinitialisation a été préparé."));
+
+        Utilisateur utilisateur = utilisateurRepository.findByEmail("etudiant@campusflow.ma").orElseThrow();
+        assertNotNull(utilisateur.getResetPasswordToken());
+        assertNotNull(utilisateur.getResetPasswordTokenExpiry());
+    }
+
+    @Test
+    void resetPassword_shouldUpdatePassword_whenTokenIsValid() throws Exception {
+        Utilisateur utilisateur = utilisateurRepository.findByEmail("etudiant@campusflow.ma").orElseThrow();
+        utilisateur.setResetPasswordToken("valid-token-123");
+        utilisateur.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(15));
+        utilisateurRepository.save(utilisateur);
+
+        mockMvc.perform(post("/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"token\":\"valid-token-123\",\"newPassword\":\"NouveauMotDePasse@123\"}"))
+            .andDo(print())
+            .andExpect(status().isOk());
+
+        Utilisateur updated = utilisateurRepository.findByEmail("etudiant@campusflow.ma").orElseThrow();
+        assertTrue(passwordEncoder.matches("NouveauMotDePasse@123", updated.getMotDePasse()));
+        assertNull(updated.getResetPasswordToken());
+        assertNull(updated.getResetPasswordTokenExpiry());
     }
 
     @Test

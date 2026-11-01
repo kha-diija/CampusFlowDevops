@@ -61,6 +61,12 @@ public abstract class Utilisateur {
     @Column(name = "actif", nullable = false)
     private Boolean actif = true;
 
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
+    @Column(name = "reset_password_token_expiry")
+    private LocalDateTime resetPasswordTokenExpiry;
+
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation;
 
