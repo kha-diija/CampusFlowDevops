@@ -1,7 +1,7 @@
 pipeline {
-    agent any
+    agent any // demander a jenkins dexecuter nimporte quel agent disponible , agant : c la machine ou lenvironemeet dexecution du travail
 
-    tools {
+    tools {   // les outils necessaire du pipeline
         maven 'maven-3.9.6'
     }
 
@@ -9,27 +9,27 @@ pipeline {
         // Nom de l'image et version (le numéro de build rend chaque image unique)
         IMAGE_BACKEND  = 'campusflowdeops'
         IMAGE_FRONTEND = 'campusflowdeops-frontend'
-        IMAGE_TAG      = "1.${BUILD_NUMBER}"
+        IMAGE_TAG      = "1.${BUILD_NUMBER}"  // version attribué aux images pour chaque build 
         // Ton identifiant Docker Hub (à adapter)
-        DOCKERHUB_USER = 'ton-utilisateur-dockerhub'
+        DOCKERHUB_USER = 'ton-utilisateur-dockerhub' 
     }
 
     triggers {
         githubPush()
-        pollSCM('H/5 * * * *')
+        pollSCM('H/5 * * * *') //verifie environ de chaque 5 min si le depot github est changé ou nn 
     }
 
-    stages {
+    stages { // les etapes du pipeline 
 
-        stage('Checkout') {
-            steps {
-                checkout scm
+        stage('Checkout') { // cree une etape nommé chechkout 
+            steps { // contient les actions executées pendant cette etape 
+                checkout scm // recupere le code source asspocié a cette job 
             }
         }
 
         stage('Build') {
             steps {
-                dir('backend') {
+                dir('backend') { // execute les cmds suivante dans le dossier de backend 
                     sh 'mvn -B clean package -DskipTests'
                 }
             }
@@ -38,7 +38,7 @@ pipeline {
         stage('Test') {
             steps {
                 dir('backend') {
-                    sh 'mvn -B test'
+                    sh 'mvn -B test' // b cad active le mode nn interactif pratique pour latomotisation
                 }
             }
             post {
@@ -58,7 +58,7 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push Docker Image') { //publier les images sur docker hub
             steps {
                 // 'dockerhub-credentials' = identifiant créé dans Jenkins
                 // (Manage Jenkins > Credentials, type "Username with password")
@@ -89,7 +89,7 @@ pipeline {
             // Optionnel : relance toute l'application avec Docker Compose
             steps {
                 sh 'docker compose up -d --build'
-                sh 'docker compose ps'
+                sh 'docker compose ps' // gere les services et les conteneurs geres par ce compose 
             }
         }
     }
