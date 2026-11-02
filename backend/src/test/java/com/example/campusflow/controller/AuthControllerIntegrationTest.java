@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,7 +45,9 @@ class AuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
         utilisateurRepository.deleteAll();
 
         Etudiant etudiant = new Etudiant();
@@ -68,6 +73,17 @@ class AuthControllerIntegrationTest {
             .andExpect(jsonPath("$.token").isNotEmpty())
             .andExpect(jsonPath("$.user.email").value("etudiant@campusflow.ma"))
             .andExpect(jsonPath("$.user.role").value("ETUDIANT"));
+    }
+
+    @Test
+    void preflightRequestFromLocalhostOrigin_shouldBeAllowed() throws Exception {
+        mockMvc.perform(options("/auth/login")
+                .header("Origin", "http://127.0.0.1:5173")
+                .header("Access-Control-Request-Method", "POST")
+                .header("Access-Control-Request-Headers", "content-type,authorization"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(header().string("Access-Control-Allow-Origin", "http://127.0.0.1:5173"));
     }
 
     @Test

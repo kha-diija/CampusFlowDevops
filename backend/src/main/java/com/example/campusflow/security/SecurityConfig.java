@@ -97,7 +97,13 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
             "http://localhost:5173",
-            "http://192.168.192.1:5173"
+            "http://localhost:5174",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174",
+            "http://0.0.0.0:5173",
+            "http://0.0.0.0:5174",
+            "http://192.168.192.1:5173",
+            "http://192.168.192.1:5174"
         ));
 
         configuration.setAllowedMethods(List.of(
@@ -105,9 +111,10 @@ public class SecurityConfig {
         ));
 
         configuration.setAllowedHeaders(List.of(
-            "Authorization", "Content-Type", "Accept"
+            "Authorization", "Content-Type", "Accept", "X-Requested-With"
         ));
 
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
