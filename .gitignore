@@ -11,3 +11,5 @@ frontend/.env.*
 # IDE
 .vscode/
 .DS_Store
+.idea/
+*.patch

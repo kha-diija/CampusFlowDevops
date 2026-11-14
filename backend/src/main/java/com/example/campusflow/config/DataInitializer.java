@@ -9,10 +9,12 @@ import com.example.campusflow.repository.SalleRepository;
 import com.example.campusflow.repository.UtilisateurRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order(1)
 @Profile("dev")
 public class DataInitializer implements CommandLineRunner {
 

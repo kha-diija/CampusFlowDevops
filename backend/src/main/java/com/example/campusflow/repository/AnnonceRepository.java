@@ -16,4 +16,14 @@ public interface AnnonceRepository extends JpaRepository<Annonce, Long> {
 
     @Query("select a from Annonce a join fetch a.auteur where a.id = :id and a.statut = :statut")
     Optional<Annonce> findByIdAndStatut(Long id, StatutAnnonce statut);
+
+    @Query("select a from Annonce a join fetch a.auteur order by a.dateModification desc")
+    List<Annonce> findAllDetailed();
+
+    @Query("select a from Annonce a join fetch a.auteur where a.id = :id")
+    Optional<Annonce> findDetailedById(@org.springframework.data.repository.query.Param("id") Long id);
+
+    long countByStatut(StatutAnnonce statut);
+
+    long countByStatutAndDatePublicationGreaterThanEqual(StatutAnnonce statut, java.time.LocalDateTime depuis);
 }

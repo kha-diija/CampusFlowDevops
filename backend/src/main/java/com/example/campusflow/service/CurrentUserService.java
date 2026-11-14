@@ -24,4 +24,13 @@ public class CurrentUserService {
         return utilisateurRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Utilisateur introuvable."));
     }
+
+    /** Utilisateur courant en tant que membre du personnel (créateur de signalements, auteur d'annonces…). */
+    public com.example.campusflow.entity.Personnel getPersonnel() {
+        Utilisateur utilisateur = get();
+        if (utilisateur instanceof com.example.campusflow.entity.Personnel personnel) {
+            return personnel;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès réservé au personnel.");
+    }
 }

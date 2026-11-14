@@ -3,10 +3,17 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import type { Role } from '@/types'
 
-export function RoleGuard({ role, children }: { role: Role; children: ReactNode }) {
-  const { user } = useAuth()
+interface RoleGuardProps {
+  role?: Role
+  roles?: Role[]
+  children: ReactNode
+}
 
-  if (!user || user.role !== role) {
+export function RoleGuard({ role, roles, children }: RoleGuardProps) {
+  const { user } = useAuth()
+  const allowed = roles ?? (role ? [role] : [])
+
+  if (!user || !allowed.includes(user.role)) {
     return <Navigate to="/dashboard" replace />
   }
 
