@@ -18,4 +18,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("select r from Reservation r join fetch r.salle "
             + "where r.utilisateur.id = :uid order by r.dateDebut desc")
     List<Reservation> findByUtilisateurId(@Param("uid") Long uid);
+
+    /** Nombre de réservations confirmées qui chevauchent la période donnée (avertissement, RG-EMP-12). */
+    long countBySalleIdAndStatutAndDateDebutLessThanAndDateFinGreaterThan(
+            Long salleId, StatutReservation statut, LocalDateTime fin, LocalDateTime debut);
 }

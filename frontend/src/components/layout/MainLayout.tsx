@@ -10,6 +10,9 @@ const TITLES: Record<string, string> = {
   '/reservations': 'Mes réservations',
   '/reservations/nouvelle': 'Nouvelle réservation',
   '/annonces': 'Annonces',
+  '/gestion/annonces': 'Gestion des annonces',
+  '/signalements': 'Signalements',
+  '/indisponibilites': 'Indisponibilités',
 }
 
 export function MainLayout({ children }: { children: ReactNode }) {

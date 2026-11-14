@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AlertCircle, CheckCircle2, Info } from 'lucide-react'
+import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const alertMap = {
@@ -10,6 +10,10 @@ const alertMap = {
   success: {
     icon: CheckCircle2,
     container: 'border-success/30 bg-success/10 text-success',
+  },
+  warning: {
+    icon: AlertTriangle,
+    container: 'border-warning/40 bg-warning/10 text-warning',
   },
   error: {
     icon: AlertCircle,

@@ -2,6 +2,7 @@
 import { MapPin, Users } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/useAuth'
 import { TYPE_SALLE_LABEL } from '@/lib/format'
 import type { Salle } from '@/types/etudiant'
 
@@ -12,6 +13,7 @@ interface Props {
 
 export function SalleCard({ salle, periode }: Props) {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const reserver = () => {
     const params = new URLSearchParams({ salleId: String(salle.id), ...(periode ?? {}) })
@@ -41,11 +43,23 @@ export function SalleCard({ salle, periode }: Props) {
       </p>
       {salle.equipements && <p className="mt-1 text-xs text-text-muted">{salle.equipements}</p>}
 
-      <div className="mt-5">
-        <Button size="sm" onClick={reserver} disabled={salle.disponible === false}>
-          Réserver
-        </Button>
-      </div>
+      {user?.role === 'ETUDIANT' && (
+        <div className="mt-5">
+          <Button size="sm" onClick={reserver} disabled={salle.disponible === false}>
+            Réserver
+          </Button>
+        </div>
+      )}
+      {user?.role === 'PERSONNEL_HABILITE' && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button size="sm" variant="secondary" onClick={() => navigate(`/signalements?nouveau=1&salleId=${salle.id}`)}>
+            Signaler un problème
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => navigate(`/indisponibilites?salleId=${salle.id}`)}>
+            Déclarer indisponible
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

@@ -3,13 +3,19 @@ import {
   Building2,
   CalendarCheck2,
   CalendarSearch,
+  FileText,
+  Flag,
   LayoutDashboard,
   LogOut,
   Plus,
+  ShieldAlert,
   ShieldCheck,
   type LucideIcon,
 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { NavLink } from 'react-router-dom'
+import { habiliteService } from '@/services/habiliteService'
+import type { Role } from '@/types'
 import { useAuth } from '@/hooks/useAuth'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -20,6 +26,7 @@ interface NavItem {
   to: string
   icon: LucideIcon
   end?: boolean
+  badge?: number
 }
 
 interface NavGroup {
@@ -27,7 +34,7 @@ interface NavGroup {
   items: NavItem[]
 }
 
-const navGroups: NavGroup[] = [
+const studentGroups: NavGroup[] = [
   {
     title: 'Mon espace',
     items: [{ label: "Vue d'ensemble", to: '/dashboard', icon: LayoutDashboard }],
@@ -52,6 +59,44 @@ const navGroups: NavGroup[] = [
   },
 ]
 
+const consultationGroups: NavGroup[] = [
+  {
+    title: 'Mon espace',
+    items: [{ label: "Vue d'ensemble", to: '/dashboard', icon: LayoutDashboard }],
+  },
+  {
+    title: 'Espaces',
+    items: [
+      { label: 'Salles', to: '/salles', icon: Building2 },
+      { label: 'Disponibilités', to: '/disponibilites', icon: CalendarSearch },
+    ],
+  },
+  {
+    title: 'Vie universitaire',
+    items: [{ label: 'Annonces', to: '/annonces', icon: Bell }],
+  },
+]
+
+function habiliteGroups(signalementsEnAttente: number): NavGroup[] {
+  return [
+    ...consultationGroups,
+    {
+      title: 'Administration',
+      items: [
+        { label: 'Gestion des annonces', to: '/gestion/annonces', icon: FileText },
+        { label: 'Signalements', to: '/signalements', icon: Flag, badge: signalementsEnAttente },
+        { label: 'Indisponibilités', to: '/indisponibilites', icon: ShieldAlert },
+      ],
+    },
+  ]
+}
+
+function groupsFor(role: Role | undefined, signalementsEnAttente: number): NavGroup[] {
+  if (role === 'ETUDIANT') return studentGroups
+  if (role === 'PERSONNEL_HABILITE') return habiliteGroups(signalementsEnAttente)
+  return consultationGroups
+}
+
 const ROLE_LABEL: Record<string, string> = {
   ETUDIANT: 'Étudiant',
   PERSONNEL: 'Personnel',
@@ -62,6 +107,14 @@ const ROLE_LABEL: Record<string, string> = {
 export function Sidebar() {
   const { user, logout } = useAuth()
   const fullName = user ? `${user.prenom} ${user.nom}` : 'Utilisateur'
+
+  // Pastille « signalements en attente » (partage le cache du tableau de bord)
+  const { data: dashboard } = useQuery({
+    queryKey: ['habilite', 'dashboard'],
+    queryFn: habiliteService.getDashboard,
+    enabled: user?.role === 'PERSONNEL_HABILITE',
+  })
+  const navGroups = groupsFor(user?.role, dashboard?.signalementsEnAttente ?? 0)
 
   return (
     <aside className="sticky top-0 flex h-screen w-[270px] shrink-0 flex-col overflow-y-auto border-r border-border bg-[#090909] p-4">
@@ -82,7 +135,7 @@ export function Sidebar() {
               {group.title}
             </p>
             <div className="space-y-1">
-              {group.items.map(({ label, to, icon: Icon, end }) => (
+              {group.items.map(({ label, to, icon: Icon, end, badge }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -102,7 +155,11 @@ export function Sidebar() {
                         <Icon className={cn('h-4 w-4', isActive && 'text-brand-orange')} />
                       </span>
                       {label}
-                      {isActive && <span className="ml-auto h-2 w-2 rounded-full bg-brand-orange" />}
+                      {badge !== undefined && badge > 0 ? (
+                        <span className="ml-auto rounded-full bg-brand-orange/20 px-2 py-0.5 text-xs font-bold text-brand-orange">{badge}</span>
+                      ) : (
+                        isActive && <span className="ml-auto h-2 w-2 rounded-full bg-brand-orange" />
+                      )}
                     </>
                   )}
                 </NavLink>
