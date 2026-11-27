@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.example.campusflow.dto.OccupationDto;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +54,13 @@ public class SalleService {
     private SalleDto toDto(Salle s, Boolean disponible) {
         return new SalleDto(s.getId(), s.getNom(), s.getBatiment(), s.getCapacite(),
                 s.getType() == null ? null : s.getType().name(), s.getEquipements(), disponible);
+    }
+
+        @Transactional(readOnly = true)
+    public List<OccupationDto> occupations(Long id, LocalDate date) {
+        if (!salleRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Salle introuvable.");
+        }
+        return disponibiliteService.occupations(id, date != null ? date : LocalDate.now());
     }
 }

@@ -12,6 +12,9 @@ import { NouvelleReservationPage } from '@/pages/etudiant/NouvelleReservationPag
 import { MesReservationsPage } from '@/pages/etudiant/MesReservationsPage'
 import { AnnoncesPage } from '@/pages/etudiant/AnnoncesPage'
 import { HabiliteDashboardPage } from '@/pages/habilite/HabiliteDashboardPage'
+import { PersonnelDashboardPage } from '@/pages/personnel/PersonnelDashboardPage'
+import { OccupationsPage } from '@/pages/personnel/OccupationsPage'
+import { ProfilPage } from '@/pages/ProfilPage'
 import { GestionAnnoncesPage } from '@/pages/habilite/GestionAnnoncesPage'
 import { SignalementsPage } from '@/pages/habilite/SignalementsPage'
 import { IndisponibilitesPage } from '@/pages/habilite/IndisponibilitesPage'
@@ -79,6 +82,7 @@ function DashboardByRole() {
   const { user } = useAuth()
   if (user?.role === 'ETUDIANT') return <EtudiantDashboardPage />
   if (user?.role === 'PERSONNEL_HABILITE') return <HabiliteDashboardPage />
+  if (user?.role === 'PERSONNEL') return <PersonnelDashboardPage /> 
   return <DashboardPage />
 }
 
@@ -88,6 +92,7 @@ export function AppRoutes() {
       <Route path="/login" element={<Auth><LoginPage /></Auth>} />
       <Route path="/forgot-password" element={<Auth><ForgotPasswordPage /></Auth>} />
       <Route path="/reset-password" element={<Auth><ResetPasswordPage /></Auth>} />
+      
 
       <Route
         path="/dashboard"
@@ -105,6 +110,8 @@ export function AppRoutes() {
       <Route path="/reservations" element={<StudentPage><MesReservationsPage /></StudentPage>} />
       <Route path="/reservations/nouvelle" element={<StudentPage><NouvelleReservationPage /></StudentPage>} />
       <Route path="/annonces" element={<SharedPage><AnnoncesPage /></SharedPage>} />
+      <Route path="/occupations" element={<SharedPage><OccupationsPage /></SharedPage>} />
+      <Route path="/profil" element={<SharedPage><ProfilPage /></SharedPage>} />
 
       <Route path="/gestion/annonces" element={<HabilitePage><GestionAnnoncesPage /></HabilitePage>} />
       <Route path="/signalements" element={<HabilitePage><SignalementsPage /></HabilitePage>} />

@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.campusflow.dto.DashboardPersonnelDto;
+import com.example.campusflow.service.DashboardPersonnelService;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final DashboardPersonnelService dashboardPersonnelService;
     private final DashboardHabiliteService dashboardHabiliteService;
     private final CurrentUserService currentUser;
 
@@ -30,5 +33,11 @@ public class DashboardController {
     @PreAuthorize("hasRole('PERSONNEL_HABILITE')")
     public DashboardHabiliteDto personnelHabilite() {
         return dashboardHabiliteService.get();
+    }
+
+    @GetMapping("/personnel")
+    @PreAuthorize("hasRole('PERSONNEL')")
+    public DashboardPersonnelDto personnel() {
+        return dashboardPersonnelService.get();
     }
 }

@@ -50,6 +50,15 @@ export function SalleCard({ salle, periode }: Props) {
           </Button>
         </div>
       )}
+
+            {user?.role === 'PERSONNEL' && (
+        <div className="mt-5">
+          <Button size="sm" variant="secondary" onClick={() => navigate(`/occupations?salleId=${salle.id}`)}>
+            Voir l'occupation
+          </Button>
+        </div>
+      )}
+
       {user?.role === 'PERSONNEL_HABILITE' && (
         <div className="mt-5 flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" onClick={() => navigate(`/signalements?nouveau=1&salleId=${salle.id}`)}>

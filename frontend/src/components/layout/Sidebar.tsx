@@ -2,6 +2,7 @@ import {
   Bell,
   Building2,
   CalendarCheck2,
+  CalendarClock, 
   CalendarSearch,
   FileText,
   Flag,
@@ -10,6 +11,7 @@ import {
   Plus,
   ShieldAlert,
   ShieldCheck,
+  UserRound,
   type LucideIcon,
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
@@ -20,6 +22,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ROLE_LABEL } from '@/lib/format'
 
 interface NavItem {
   label: string
@@ -77,6 +80,29 @@ const consultationGroups: NavGroup[] = [
   },
 ]
 
+// PERSONNEL : consultation uniquement (salles, disponibilités, occupation, annonces) + compte
+const personnelGroups: NavGroup[] = [
+  {
+    title: 'Mon espace',
+    items: [
+      { label: "Vue d'ensemble", to: '/dashboard', icon: LayoutDashboard },
+      { label: 'Mon compte', to: '/profil', icon: UserRound },
+    ],
+  },
+  {
+    title: 'Espaces',
+    items: [
+      { label: 'Salles', to: '/salles', icon: Building2 },
+      { label: 'Disponibilités', to: '/disponibilites', icon: CalendarSearch },
+      { label: 'Occupation des salles', to: '/occupations', icon: CalendarClock },
+    ],
+  },
+  {
+    title: 'Vie universitaire',
+    items: [{ label: 'Annonces', to: '/annonces', icon: Bell }],
+  },
+]
+
 function habiliteGroups(signalementsEnAttente: number): NavGroup[] {
   return [
     ...consultationGroups,
@@ -94,15 +120,10 @@ function habiliteGroups(signalementsEnAttente: number): NavGroup[] {
 function groupsFor(role: Role | undefined, signalementsEnAttente: number): NavGroup[] {
   if (role === 'ETUDIANT') return studentGroups
   if (role === 'PERSONNEL_HABILITE') return habiliteGroups(signalementsEnAttente)
+  if (role === 'PERSONNEL') return personnelGroups
   return consultationGroups
 }
 
-const ROLE_LABEL: Record<string, string> = {
-  ETUDIANT: 'Étudiant',
-  PERSONNEL: 'Personnel',
-  PERSONNEL_HABILITE: 'Personnel habilité',
-  GESTIONNAIRE_EMPLOI_DU_TEMPS: 'Gestionnaire',
-}
 
 export function Sidebar() {
   const { user, logout } = useAuth()

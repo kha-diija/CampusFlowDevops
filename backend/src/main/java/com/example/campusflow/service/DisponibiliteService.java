@@ -11,6 +11,10 @@ import java.time.LocalTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.campusflow.dto.OccupationDto;
+import java.util.Comparator;
+import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,4 +41,40 @@ public class DisponibiliteService {
         }
         return Optional.empty();
     }
+    /**
+     * Liste les créneaux occupés d'une salle pour une journée : cours programmés, réservations confirmées
+     * et indisponibilités actives (RG-BOOK-07, 08, 09). Les périodes qui dépassent la journée sont tronquées.
+     * Aucune donnée personnelle n'est exposée (pas de nom d'étudiant ni de motif de réservation).
+     */
+    @Transactional(readOnly = true)
+    public List<OccupationDto> occupations(Long salleId, LocalDate date) {
+        LocalDateTime debutJour = date.atStartOfDay();
+        LocalDateTime finJour = date.plusDays(1).atStartOfDay();
+
+        List<OccupationDto> resultat = new java.util.ArrayList<>();
+
+        cours.findBySalleIdAndDateOrderByHeureDebutAsc(salleId, date).forEach(c ->
+                resultat.add(new OccupationDto("COURS", date, c.getHeureDebut(), c.getHeureFin(),
+                        c.getMatiere() + " · " + c.getGroupe())));
+
+        reservations.findBySalleIdAndStatutAndDateDebutLessThanAndDateFinGreaterThanOrderByDateDebutAsc(
+                salleId, StatutReservation.CONFIRMEE, finJour, debutJour).forEach(r ->
+                resultat.add(tronquer("RESERVATION", date, r.getDateDebut(), r.getDateFin(), "Réservée")));
+
+        indisponibilites.findBySalleIdAndActiveTrueAndDateDebutLessThanAndDateFinGreaterThanOrderByDateDebutAsc(
+                salleId, finJour, debutJour).forEach(i ->
+                resultat.add(tronquer("INDISPONIBILITE", date, i.getDateDebut(), i.getDateFin(), i.getMotif())));
+
+        resultat.sort(Comparator.comparing(OccupationDto::heureDebut).thenComparing(OccupationDto::heureFin));
+        return resultat;
+    }
+
+    private OccupationDto tronquer(String type, LocalDate jour, LocalDateTime debut, LocalDateTime fin, String libelle) {
+        LocalDateTime debutJour = jour.atStartOfDay();
+        LocalDateTime finJour = jour.plusDays(1).atStartOfDay();
+        LocalTime heureDebut = debut.isBefore(debutJour) ? LocalTime.MIDNIGHT : debut.toLocalTime();
+        LocalTime heureFin = fin.isBefore(finJour) ? fin.toLocalTime() : LocalTime.of(23, 59);
+        return new OccupationDto(type, jour, heureDebut, heureFin, libelle);
+    }
+    
 }

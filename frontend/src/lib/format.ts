@@ -17,6 +17,13 @@ export const TYPE_SALLE_LABEL: Record<string, string> = {
   SALLE_REUNION: 'Salle de réunion',
 }
 
+export const ROLE_LABEL: Record<string, string> = {
+  ETUDIANT: 'Étudiant',
+  PERSONNEL: 'Personnel',
+  PERSONNEL_HABILITE: 'Personnel habilité',
+  GESTIONNAIRE_EMPLOI_DU_TEMPS: 'Gestionnaire',
+}
+
 export const fieldClass =
   'w-full rounded-xl border border-border bg-[#0D0D0D] px-3 py-2.5 text-sm text-text-primary ' +
   'placeholder:text-text-secondary focus:border-brand-orange focus:outline-none focus:ring-1 focus:ring-brand-orange'

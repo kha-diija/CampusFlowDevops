@@ -10,6 +10,8 @@ const TITLES: Record<string, string> = {
   '/reservations': 'Mes réservations',
   '/reservations/nouvelle': 'Nouvelle réservation',
   '/annonces': 'Annonces',
+  '/occupations': 'Occupation des salles',
+  '/profil': 'Mon compte',
   '/gestion/annonces': 'Gestion des annonces',
   '/signalements': 'Signalements',
   '/indisponibilites': 'Indisponibilités',
