@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import com.example.campusflow.dto.OccupationDto;
 
 @RestController
 @RequestMapping("/salles")
@@ -32,5 +33,13 @@ public class SalleController {
     @GetMapping("/{id}")
     public SalleDto detail(@PathVariable Long id) {
         return salleService.trouver(id);
+    }
+
+        /** Créneaux occupés d'une salle pour une journée (cours, réservations confirmées, indisponibilités). */
+    @GetMapping("/{id}/occupations")
+    public List<OccupationDto> occupations(
+            @PathVariable Long id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return salleService.occupations(id, date);
     }
 }

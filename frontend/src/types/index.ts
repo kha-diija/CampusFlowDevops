@@ -8,6 +8,7 @@ export interface User {
   role: Role
   actif?: boolean
   autorisePublication?: boolean | null
+  dateCreation?: string
 }
 
 export interface LoginRequest {

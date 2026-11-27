@@ -22,4 +22,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     /** Nombre de réservations confirmées qui chevauchent la période donnée (avertissement, RG-EMP-12). */
     long countBySalleIdAndStatutAndDateDebutLessThanAndDateFinGreaterThan(
             Long salleId, StatutReservation statut, LocalDateTime fin, LocalDateTime debut);
+
+        List<Reservation> findBySalleIdAndStatutAndDateDebutLessThanAndDateFinGreaterThanOrderByDateDebutAsc(
+            Long salleId, StatutReservation statut, LocalDateTime fin, LocalDateTime debut);
 }

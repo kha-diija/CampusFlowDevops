@@ -29,4 +29,7 @@ public interface IndisponibiliteSalleRepository extends JpaRepository<Indisponib
     @Query("select i.signalement.id from IndisponibiliteSalle i "
             + "where i.active = true and i.dateFin > :maintenant and i.signalement is not null")
     List<Long> findSignalementIdsAvecIndisponibiliteActive(@Param("maintenant") LocalDateTime maintenant);
+    List<IndisponibiliteSalle> findBySalleIdAndActiveTrueAndDateDebutLessThanAndDateFinGreaterThanOrderByDateDebutAsc(
+            Long salleId, LocalDateTime fin, LocalDateTime debut);
+
 }
